@@ -354,6 +354,155 @@
                 grid-template-columns: 1fr;
             }
         }
+
+        .installation-steps .step {
+            display: flex;
+            gap: 1rem;
+        }
+
+        .step-number {
+            width: 32px;
+            height: 32px;
+            background: var(--accent-color);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+        }
+
+        .step-content {
+            flex: 1;
+        }
+
+        .function-option {
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 8px;
+            padding: 1rem;
+        }
+
+        .site-url-display {
+            background: rgba(79, 70, 229, 0.1);
+            border: 1px solid rgba(79, 70, 229, 0.2);
+            border-radius: 12px;
+            padding: 1rem 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .site-url-display strong {
+            color: var(--accent-color);
+            display: block;
+            margin-bottom: 0.5rem;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .site-url-display span {
+            font-size: 1.1rem;
+            word-break: break-all;
+        }
+
+        .clone-item {
+            background: rgba(0, 0, 0, 0.2);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 1.5rem;
+            margin-bottom: 1rem;
+            transition: all 0.3s;
+        }
+
+        .clone-item:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+            border-color: var(--accent-color);
+        }
+
+        .clone-url {
+            font-size: 1.1rem;
+            color: var(--text-primary);
+            margin-bottom: 1rem;
+            word-break: break-all;
+        }
+
+        .clone-info {
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+            margin-bottom: 1.5rem;
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+
+        .clone-info-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .clone-status {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem 1rem;
+            border-radius: 100px;
+            font-size: 0.85rem;
+            font-weight: 500;
+        }
+
+        .clone-status.pending {
+            background: rgba(245, 158, 11, 0.1);
+            color: var(--warning-color);
+        }
+
+        .clone-status.blocked {
+            background: rgba(16, 185, 129, 0.1);
+            color: var(--success-color);
+        }
+
+        .clone-actions {
+            display: flex;
+            gap: 1rem;
+        }
+
+        .btn-functions {
+            background: var(--accent-gradient);
+            color: white;
+            border: none;
+            padding: 0.8rem 1.5rem;
+            border-radius: 12px;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-weight: 500;
+        }
+
+        .btn-functions:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(79, 70, 229, 0.3);
+        }
+
+        .empty-clones {
+            text-align: center;
+            padding: 3rem 2rem;
+        }
+
+        .empty-clones i {
+            font-size: 3rem;
+            color: var(--accent-color);
+            margin-bottom: 1.5rem;
+        }
+
+        .empty-clones h4 {
+            color: var(--text-primary);
+            margin-bottom: 1rem;
+        }
+
+        .empty-clones p {
+            color: var(--text-secondary);
+        }
     </style>
 </head>
 <body>
@@ -368,7 +517,7 @@
 
         <nav>
             <a href="#" class="nav-item active">
-                <i class="bi bi-grid-1x2-fill"></i> Dashboard W2 Anti Clone
+                <i class="bi bi-grid-1x2-fill"></i> Dashboard
             </a>
             <a href="#" class="nav-item">
                 <i class="bi bi-shield-check"></i> Proteção
@@ -449,7 +598,7 @@
         </div>
     </div>
 
-    <!-- Modal Configurações do Site -->
+    <!-- Modal de Configurações -->
     <div class="modal fade" id="configModal" tabindex="-1">
         <div class="modal-dialog modal-lg">
             <div class="modal-content">
@@ -460,47 +609,122 @@
                 <div class="modal-body">
                     <div class="config-section">
                         <h6>Script de Proteção</h6>
-                        <p class="text-secondary mb-3">Copie e cole este código no final da tag &lt;body&gt; do seu site:</p>
-                        <pre id="configScript" class="bg-dark p-3 rounded" style="color: #fff;"></pre>
-                        <button class="btn-config" onclick="copyScript()">
-                            <i class="bi bi-clipboard"></i> Copiar Script
-                        </button>
-                        <div class="mt-3">
-                            <small class="text-secondary">
-                                <i class="bi bi-info-circle"></i> 
-                                O script verificará automaticamente se seu site está sendo clonado e aplicará as ações configuradas abaixo.
-                            </small>
-                        </div>
-                    </div>
-                    <div class="config-section">
-                        <h6>Ações para Clones</h6>
-                        <div class="form-check mb-3">
-                            <input class="form-check-input" type="checkbox" id="actionRedirect" onchange="toggleRedirectUrl()">
-                            <label class="form-check-label" for="actionRedirect">
-                                Redirecionar para site original
-                            </label>
-                            <div id="redirectUrlContainer" class="mt-2 d-none">
-                                <input type="url" class="form-control" id="redirectUrl" 
-                                       placeholder="https://seusite.com">
-                                <small class="text-secondary">URL para onde o clone será redirecionado</small>
+                        <p class="text-secondary mb-3">Siga os passos abaixo para proteger seu site:</p>
+                        
+                        <div class="installation-steps mb-4">
+                            <div class="step mb-3">
+                                <div class="step-number">1</div>
+                                <div class="step-content">
+                                    <h6>Copie o script</h6>
+                                    <pre id="configScript" class="bg-dark p-3 rounded" style="color: #fff;"></pre>
+                                    <button class="btn-config mt-2" onclick="copyScript()">
+                                        <i class="bi bi-clipboard"></i> Copiar Script
+                                    </button>
+                                </div>
                             </div>
-                        </div>
-                        <div class="form-check">
-                            <input class="form-check-input" type="checkbox" id="actionImages" onchange="toggleImageUrl()">
-                            <label class="form-check-label" for="actionImages">
-                                Substituir imagens
-                            </label>
-                            <div id="imageUrlContainer" class="mt-2 d-none">
-                                <input type="url" class="form-control" id="imageUrl" 
-                                       placeholder="https://suaimagem.com/imagem.jpg">
-                                <small class="text-secondary">URL da imagem que substituirá todas as imagens do clone</small>
+                            
+                            <div class="step mb-3">
+                                <div class="step-number">2</div>
+                                <div class="step-content">
+                                    <h6>Cole no seu site</h6>
+                                    <p class="text-secondary">Cole o script no final da tag &lt;body&gt; do seu site, logo antes do fechamento.</p>
+                                </div>
+                            </div>
+                            
+                            <div class="step">
+                                <div class="step-number">3</div>
+                                <div class="step-content">
+                                    <h6>Pronto!</h6>
+                                    <p class="text-secondary">Seu site está protegido. Você receberá notificações quando clones forem detectados.</p>
+                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fechar</button>
-                    <button type="button" class="btn-add" onclick="saveConfig()">Salvar Alterações</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de Atividades -->
+    <div class="modal fade" id="activityModal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Atividades do Site</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="site-url-display">
+                        <strong>Site Original</strong>
+                        <span id="originalSiteUrl"></span>
+                    </div>
+                    
+                    <div class="clones-list" id="clonesList">
+                        <!-- Lista de clones será carregada aqui -->
+                    </div>
+                    
+                    <div class="empty-clones d-none">
+                        <i class="bi bi-shield-check"></i>
+                        <h4>Nenhum Clone Detectado</h4>
+                        <p>Seu site está protegido e nenhuma tentativa de clonagem foi detectada.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de Funções -->
+    <div class="modal fade" id="functionsModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Funções Anti-Clone</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="clone-url-display mb-4">
+                        <strong>Clone detectado</strong>
+                        <span id="cloneUrlDisplay"></span>
+                    </div>
+
+                    <div class="functions-section">
+                        <div class="function-option mb-3">
+                            <label class="d-flex align-items-center mb-2">
+                                <input type="checkbox" id="redirectOption" class="form-check-input me-2">
+                                <span>Redirecionar visitantes</span>
+                            </label>
+                            <input type="url" id="redirectUrl" class="form-control" 
+                                   placeholder="https://seusite.com">
+                            <small class="text-secondary">Os visitantes serão redirecionados para este endereço</small>
+                        </div>
+
+                        <div class="function-option mb-3">
+                            <label class="d-flex align-items-center mb-2">
+                                <input type="checkbox" id="redirectLinksOption" class="form-check-input me-2">
+                                <span>Redirecionar links</span>
+                            </label>
+                            <input type="url" id="redirectLinksUrl" class="form-control" 
+                                   placeholder="https://seusite.com">
+                            <small class="text-secondary">Todos os links da página serão redirecionados para este endereço</small>
+                        </div>
+
+                        <div class="function-option mb-3">
+                            <label class="d-flex align-items-center mb-2">
+                                <input type="checkbox" id="replaceImagesOption" class="form-check-input me-2">
+                                <span>Substituir imagens</span>
+                            </label>
+                            <input type="url" id="imageUrl" class="form-control" 
+                                   placeholder="https://suaimagem.com/imagem.jpg">
+                            <small class="text-secondary">Todas as imagens serão substituídas por esta</small>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="button" class="btn-add" onclick="saveFunctions()">Salvar</button>
                 </div>
             </div>
         </div>
@@ -510,12 +734,17 @@
     <script>
         let addSiteModal;
         let configModal;
+        let activityModal;
+        let functionsModal;
         let currentSiteId;
+        let currentCloneUrl;
         let sites = [];
 
         document.addEventListener('DOMContentLoaded', () => {
             addSiteModal = new bootstrap.Modal(document.getElementById('addSiteModal'));
             configModal = new bootstrap.Modal(document.getElementById('configModal'));
+            activityModal = new bootstrap.Modal(document.getElementById('activityModal'));
+            functionsModal = new bootstrap.Modal(document.getElementById('functionsModal'));
             loadSites();
         });
 
@@ -530,38 +759,95 @@
             addSiteModal.show();
         }
 
-        function toggleRedirectUrl() {
-            const container = document.getElementById('redirectUrlContainer');
-            const isChecked = document.getElementById('actionRedirect').checked;
-            container.classList.toggle('d-none', !isChecked);
-        }
-
-        function toggleImageUrl() {
-            const container = document.getElementById('imageUrlContainer');
-            const isChecked = document.getElementById('actionImages').checked;
-            container.classList.toggle('d-none', !isChecked);
-        }
-
-        function showConfigModal(siteId) {
+        function showActivityModal(siteId) {
             currentSiteId = siteId;
             const site = sites.find(s => s._id === siteId);
+            
             if (site) {
-                const scriptContent = `<script src="https://w2clone.onrender.com/w2clone.js"><\/script>
-<script>
-    W2Clone.protect("${site.url}");
-<\/script>`;
+                document.getElementById('originalSiteUrl').textContent = site.url;
+                const clonesList = document.getElementById('clonesList');
+                const emptyClones = document.querySelector('.empty-clones');
                 
-                document.getElementById('configScript').textContent = scriptContent;
-                document.getElementById('actionRedirect').checked = site.actions?.redirect || false;
-                document.getElementById('actionImages').checked = site.actions?.replaceImages || false;
-                
-                document.getElementById('redirectUrl').value = site.actions?.redirectUrl || '';
-                document.getElementById('imageUrl').value = site.actions?.imageUrl || '';
-                
-                toggleRedirectUrl();
-                toggleImageUrl();
+                if (site.clones && site.clones.length > 0) {
+                    clonesList.innerHTML = site.clones.map(clone => `
+                        <div class="clone-item">
+                            <div class="clone-url">${clone.url}</div>
+                            <div class="clone-info">
+                                <div class="clone-info-item">
+                                    <i class="bi bi-clock"></i>
+                                    Detectado em: ${new Date(clone.detectedAt).toLocaleString()}
+                                </div>
+                                <div class="clone-status ${clone.status === 'blocked' ? 'blocked' : 'pending'}">
+                                    <i class="bi bi-${clone.status === 'blocked' ? 'shield-check' : 'shield-exclamation'}"></i>
+                                    ${clone.status === 'blocked' ? 'Bloqueado' : 'Pendente'}
+                                </div>
+                            </div>
+                            <div class="clone-actions">
+                                <button class="btn-functions" onclick="showFunctionsModal('${siteId}', '${clone.url}')">
+                                    <i class="bi bi-lightning"></i>
+                                    Funções
+                                </button>
+                            </div>
+                        </div>
+                    `).join('');
+                    clonesList.classList.remove('d-none');
+                    emptyClones.classList.add('d-none');
+                } else {
+                    clonesList.classList.add('d-none');
+                    emptyClones.classList.remove('d-none');
+                }
             }
-            configModal.show();
+            
+            activityModal.show();
+        }
+
+        function showFunctionsModal(siteId, cloneUrl) {
+            currentSiteId = siteId;
+            currentCloneUrl = cloneUrl;
+            const site = sites.find(s => s._id === siteId);
+            
+            document.getElementById('cloneUrlDisplay').textContent = cloneUrl;
+            document.getElementById('redirectOption').checked = site.actions?.redirect || false;
+            document.getElementById('redirectLinksOption').checked = site.actions?.redirectLinks || false;
+            document.getElementById('replaceImagesOption').checked = site.actions?.replaceImages || false;
+            document.getElementById('redirectUrl').value = site.actions?.redirectUrl || '';
+            document.getElementById('redirectLinksUrl').value = site.actions?.redirectLinksUrl || '';
+            document.getElementById('imageUrl').value = site.actions?.imageUrl || '';
+            
+            activityModal.hide();
+            functionsModal.show();
+        }
+
+        async function saveFunctions() {
+            try {
+                const actions = {
+                    redirect: document.getElementById('redirectOption').checked,
+                    redirectUrl: document.getElementById('redirectUrl').value,
+                    redirectLinks: document.getElementById('redirectLinksOption').checked,
+                    redirectLinksUrl: document.getElementById('redirectLinksUrl').value,
+                    replaceImages: document.getElementById('replaceImagesOption').checked,
+                    imageUrl: document.getElementById('imageUrl').value
+                };
+
+                const response = await fetch(`/api/sites/${currentSiteId}/config`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ actions })
+                });
+
+                if (response.ok) {
+                    functionsModal.hide();
+                    showActivityModal(currentSiteId);
+                    loadSites();
+                } else {
+                    throw new Error('Erro ao salvar configurações');
+                }
+            } catch (error) {
+                console.error('Erro:', error);
+                alert('Erro ao salvar configurações');
+            }
         }
 
         async function loadSites() {
@@ -596,8 +882,11 @@
                             </div>
                         </div>
                         <div class="site-actions">
-                            <button class="btn-config" onclick="showConfigModal('${site._id}')">
-                                <i class="bi bi-sliders"></i> Configurações
+                            <button class="btn-config me-2" onclick="showConfigModal('${site._id}')">
+                                <i class="bi bi-code-square"></i> Configurações
+                            </button>
+                            <button class="btn-config" onclick="showActivityModal('${site._id}')">
+                                <i class="bi bi-activity"></i> Ver Atividades
                             </button>
                         </div>
                     </div>
@@ -634,43 +923,24 @@
             }
         }
 
-        async function saveConfig() {
-            try {
-                const actions = {
-                    redirect: document.getElementById('actionRedirect').checked,
-                    replaceImages: document.getElementById('actionImages').checked,
-                    redirectUrl: document.getElementById('redirectUrl').value,
-                    imageUrl: document.getElementById('imageUrl').value
-                };
-
-                // Validar URLs quando as ações estão ativas
-                if (actions.redirect && !actions.redirectUrl) {
-                    alert('Por favor, insira a URL de redirecionamento');
-                    return;
-                }
-                if (actions.replaceImages && !actions.imageUrl) {
-                    alert('Por favor, insira a URL da imagem');
-                    return;
-                }
-
-                const response = await fetch(`/api/sites/${currentSiteId}/config`, {
-                    method: 'PUT',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({ actions })
-                });
-
-                if (response.ok) {
-                    configModal.hide();
-                    loadSites();
-                } else {
-                    const data = await response.json();
-                    alert('Erro ao salvar configurações: ' + data.error);
-                }
-            } catch (error) {
-                alert('Erro ao salvar configurações: ' + error.message);
+        function showConfigModal(siteId) {
+            currentSiteId = siteId;
+            const site = sites.find(s => s._id === siteId);
+            if (site) {
+                const scriptContent = `<script src="https://w2clone.onrender.com/w2clone.js"><\/script>
+<script>
+    W2Clone.protect("${site.url}");
+<\/script>`;
+                
+                document.getElementById('configScript').textContent = scriptContent;
             }
+            configModal.show();
+        }
+
+        function copyScript() {
+            const script = document.getElementById('configScript');
+            navigator.clipboard.writeText(script.textContent);
+            alert('Script copiado com sucesso!');
         }
 
         function filterSites(query) {
@@ -701,18 +971,15 @@
                         </div>
                     </div>
                     <div class="site-actions">
-                        <button class="btn-config" onclick="showConfigModal('${site._id}')">
-                            <i class="bi bi-sliders"></i> Configurações
+                        <button class="btn-config me-2" onclick="showConfigModal('${site._id}')">
+                            <i class="bi bi-code-square"></i> Configurações
+                        </button>
+                        <button class="btn-config" onclick="showActivityModal('${site._id}')">
+                            <i class="bi bi-activity"></i> Ver Atividades
                         </button>
                     </div>
                 </div>
             `).join('');
-        }
-
-        function copyScript() {
-            const script = document.getElementById('configScript');
-            navigator.clipboard.writeText(script.textContent);
-            alert('Script copiado com sucesso!');
         }
     </script>
 </body>
