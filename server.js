@@ -22,16 +22,18 @@ const SiteSchema = new mongoose.Schema({
   createdAt: { type: Date, default: Date.now },
   scriptActive: { type: Boolean, default: true },
   lastCheck: { type: Date },
-  actions: {
-    redirect: { type: Boolean, default: false },
-    redirectUrl: { type: String },
-    replaceImages: { type: Boolean, default: false },
-    imageUrl: { type: String }
-  },
   clones: [{
     url: String,
     detectedAt: { type: Date, default: Date.now },
-    status: { type: String, enum: ['pending', 'blocked'], default: 'pending' }
+    status: { type: String, enum: ['pending', 'blocked'], default: 'pending' },
+    actions: {
+      redirect: { type: Boolean, default: false },
+      redirectUrl: { type: String },
+      redirectLinks: { type: Boolean, default: false },
+      redirectLinksUrl: { type: String },
+      replaceImages: { type: Boolean, default: false },
+      imageUrl: { type: String }
+    }
   }]
 });
 
@@ -161,6 +163,32 @@ app.put('/api/sites/:siteId/config', async (req, res) => {
   }
 });
 
+app.put('/api/sites/:siteId/clones/:cloneUrl/config', async (req, res) => {
+  try {
+    const { siteId } = req.params;
+    const cloneUrl = decodeURIComponent(req.params.cloneUrl);
+    const { actions } = req.body;
+    
+    const site = await Site.findById(siteId);
+    if (!site) {
+      return res.status(404).json({ error: 'Site não encontrado' });
+    }
+    
+    const clone = site.clones.find(c => c.url === cloneUrl);
+    if (!clone) {
+      return res.status(404).json({ error: 'Clone não encontrado' });
+    }
+
+    clone.actions = actions;
+    await site.save();
+    
+    res.json({ success: true, clone });
+  } catch (error) {
+    console.error('Erro ao atualizar configurações do clone:', error);
+    res.status(500).json({ error: 'Erro ao atualizar configurações' });
+  }
+});
+
 app.post('/api/verify', async (req, res) => {
   try {
     const { originalUrl, cloneUrl } = req.body;
@@ -177,29 +205,29 @@ app.post('/api/verify', async (req, res) => {
     let clone = site.clones.find(c => c.url === cloneUrl);
     
     if (!clone) {
-      // Adicionar novo clone
-      site.clones.push({
+      // Adicionar novo clone com ações vazias
+      clone = {
         url: cloneUrl,
         detectedAt: new Date(),
-        status: 'pending'
-      });
+        status: 'pending',
+        actions: {
+          redirect: false,
+          redirectLinks: false,
+          replaceImages: false
+        }
+      };
+      site.clones.push(clone);
     }
     
     await site.save();
 
-    // Retornar ações com as URLs configuradas
-    const actions = {
-      redirect: site.actions.redirect,
-      redirectUrl: site.actions.redirectUrl,
-      replaceImages: site.actions.replaceImages,
-      imageUrl: site.actions.imageUrl
-    };
-
-    // Enviar notificação (você pode implementar isso depois)
-    // notifyOwner(site.url, cloneUrl);
-
-    res.json({ isClone: true, actions });
+    // Retornar ações específicas deste clone
+    res.json({ 
+      isClone: true, 
+      actions: clone.actions 
+    });
   } catch (error) {
+    console.error('Erro ao verificar clone:', error);
     res.status(400).json({ error: error.message });
   }
 });

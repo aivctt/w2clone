@@ -805,14 +805,27 @@
             currentSiteId = siteId;
             currentCloneUrl = cloneUrl;
             const site = sites.find(s => s._id === siteId);
+            const clone = site.clones.find(c => c.url === cloneUrl);
             
             document.getElementById('cloneUrlDisplay').textContent = cloneUrl;
-            document.getElementById('redirectOption').checked = site.actions?.redirect || false;
-            document.getElementById('redirectLinksOption').checked = site.actions?.redirectLinks || false;
-            document.getElementById('replaceImagesOption').checked = site.actions?.replaceImages || false;
-            document.getElementById('redirectUrl').value = site.actions?.redirectUrl || '';
-            document.getElementById('redirectLinksUrl').value = site.actions?.redirectLinksUrl || '';
-            document.getElementById('imageUrl').value = site.actions?.imageUrl || '';
+            
+            // Carregar configurações específicas do clone
+            if (clone && clone.actions) {
+                document.getElementById('redirectOption').checked = clone.actions.redirect || false;
+                document.getElementById('redirectLinksOption').checked = clone.actions.redirectLinks || false;
+                document.getElementById('replaceImagesOption').checked = clone.actions.replaceImages || false;
+                document.getElementById('redirectUrl').value = clone.actions.redirectUrl || '';
+                document.getElementById('redirectLinksUrl').value = clone.actions.redirectLinksUrl || '';
+                document.getElementById('imageUrl').value = clone.actions.imageUrl || '';
+            } else {
+                // Resetar formulário se não houver configurações
+                document.getElementById('redirectOption').checked = false;
+                document.getElementById('redirectLinksOption').checked = false;
+                document.getElementById('replaceImagesOption').checked = false;
+                document.getElementById('redirectUrl').value = '';
+                document.getElementById('redirectLinksUrl').value = '';
+                document.getElementById('imageUrl').value = '';
+            }
             
             activityModal.hide();
             functionsModal.show();
@@ -829,7 +842,7 @@
                     imageUrl: document.getElementById('imageUrl').value
                 };
 
-                const response = await fetch(`/api/sites/${currentSiteId}/config`, {
+                const response = await fetch(`/api/sites/${currentSiteId}/clones/${encodeURIComponent(currentCloneUrl)}/config`, {
                     method: 'PUT',
                     headers: {
                         'Content-Type': 'application/json'
@@ -839,14 +852,15 @@
 
                 if (response.ok) {
                     functionsModal.hide();
-                    showActivityModal(currentSiteId);
-                    loadSites();
+                    await loadSites(); // Recarregar todos os sites para atualizar os dados
+                    showActivityModal(currentSiteId); // Reabrir o modal de atividades
                 } else {
-                    throw new Error('Erro ao salvar configurações');
+                    const data = await response.json();
+                    throw new Error(data.error || 'Erro ao salvar configurações');
                 }
             } catch (error) {
                 console.error('Erro:', error);
-                alert('Erro ao salvar configurações');
+                alert('Erro ao salvar configurações: ' + error.message);
             }
         }
 
