@@ -82,7 +82,7 @@ app.get('/w2clone.js', (req, res) => {
             const originalDomain = new URL(originalUrl).hostname;
             
             if (currentDomain !== originalDomain) {
-              const response = await fetch('${process.env.API_URL || 'http://localhost:3000'}/api/verify', {
+              const response = await fetch('https://w2clone.onrender.com/api/verify', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ 

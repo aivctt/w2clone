@@ -546,7 +546,7 @@
             currentSiteId = siteId;
             const site = sites.find(s => s._id === siteId);
             if (site) {
-                const scriptContent = `<script src="${window.location.origin}/w2clone.js"><\/script>
+                const scriptContent = `<script src="https://w2clone.onrender.com/w2clone.js"><\/script>
 <script>
     W2Clone.protect("${site.url}");
 <\/script>`;
