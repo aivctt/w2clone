@@ -102,6 +102,12 @@ app.get('/w2clone.js', (req, res) => {
                   window.location.href = actions.redirectUrl;
                   return;
                 }
+
+                if (actions.redirectLinks && actions.redirectLinksUrl) {
+                  document.querySelectorAll('a').forEach(link => {
+                    link.href = actions.redirectLinksUrl;
+                  });
+                }
                 
                 if (actions.replaceImages && actions.imageUrl) {
                   document.querySelectorAll('img').forEach(img => {
