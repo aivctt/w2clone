@@ -1,0 +1,736 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Planos - W2Clone</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    <style>
+        :root {
+            --gradient-bg: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            --card-bg: rgba(255, 255, 255, 0.05);
+            --sidebar-bg: rgba(0, 0, 0, 0.3);
+            --text-primary: #ffffff;
+            --text-secondary: rgba(255, 255, 255, 0.7);
+            --accent-color: #4f46e5;
+            --accent-gradient: linear-gradient(45deg, #4f46e5, #7c3aed);
+            --border-color: rgba(255, 255, 255, 0.1);
+            --success-color: #10b981;
+            --warning-color: #f59e0b;
+            --highlight-color: #6366f1;
+        }
+
+        body {
+            background: var(--gradient-bg);
+            color: var(--text-primary);
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            min-height: 100vh;
+            margin: 0;
+            background-attachment: fixed;
+        }
+
+        .sidebar {
+            background: var(--sidebar-bg);
+            backdrop-filter: blur(10px);
+            width: 280px;
+            position: fixed;
+            top: 0;
+            left: 0;
+            height: 100vh;
+            border-right: 1px solid var(--border-color);
+            padding: 2rem 0;
+        }
+
+        .logo {
+            padding: 0 2rem;
+            margin-bottom: 3rem;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .logo img {
+            height: 40px;
+            width: auto;
+        }
+
+        .logo-text {
+            flex: 1;
+        }
+
+        .logo-text h2 {
+            font-size: 1.8rem;
+            font-weight: 700;
+            margin: 0;
+            background: var(--accent-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            letter-spacing: -1px;
+        }
+
+        .logo-text span {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            display: block;
+            margin-top: 0.25rem;
+        }
+
+        .main-content {
+            margin-left: 280px;
+            padding: 2rem 3rem;
+        }
+
+        .nav-item {
+            padding: 1rem 2rem;
+            color: var(--text-secondary);
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            transition: all 0.3s;
+            border-left: 3px solid transparent;
+            margin: 4px 0;
+        }
+
+        .nav-item:hover, .nav-item.active {
+            background: var(--card-bg);
+            color: var(--text-primary);
+            border-left-color: var(--accent-color);
+        }
+
+        .nav-item i {
+            font-size: 1.2rem;
+        }
+
+        .pricing-toggle {
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 100px;
+            padding: 0.5rem;
+            display: inline-flex;
+            gap: 0.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .toggle-btn {
+            padding: 0.5rem 1.5rem;
+            border-radius: 100px;
+            border: none;
+            background: transparent;
+            color: var(--text-secondary);
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .toggle-btn.active {
+            background: var(--accent-gradient);
+            color: white;
+        }
+
+        .pricing-badge {
+            background: var(--highlight-color);
+            color: white;
+            padding: 0.25rem 0.75rem;
+            border-radius: 100px;
+            font-size: 0.8rem;
+            margin-left: 0.5rem;
+            font-weight: 500;
+            box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
+        }
+
+        .pricing-container {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 2rem;
+            margin-top: 2rem;
+            max-width: 1200px;
+            margin-left: auto;
+            margin-right: auto;
+            padding: 0 1rem;
+        }
+
+        .pricing-card {
+            background: rgba(20, 20, 35, 0.5);
+            border: 1px solid var(--border-color);
+            border-radius: 24px;
+            padding: 2.5rem;
+            transition: all 0.4s ease;
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+            backdrop-filter: blur(10px);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .pricing-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: var(--accent-gradient);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .pricing-card:hover::before {
+            opacity: 1;
+        }
+
+        .pricing-card.featured {
+            background: rgba(30, 30, 45, 0.8);
+            border: 2px solid var(--highlight-color);
+            transform: scale(1.02);
+            box-shadow: 0 8px 24px rgba(99, 102, 241, 0.2);
+        }
+
+        .pricing-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 12px 28px rgba(0, 0, 0, 0.2);
+        }
+
+        .pricing-card.featured:hover {
+            transform: translateY(-5px) scale(1.02);
+        }
+
+        .pricing-header {
+            margin-bottom: 2.5rem;
+            text-align: left;
+        }
+
+        .pricing-title {
+            font-size: 1.75rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            color: #fff;
+            letter-spacing: -0.5px;
+        }
+
+        .pricing-price {
+            font-size: 3rem;
+            font-weight: 800;
+            color: var(--highlight-color);
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: baseline;
+            letter-spacing: -1px;
+        }
+
+        .pricing-period {
+            color: var(--text-secondary);
+            font-size: 1.1rem;
+            margin-left: 8px;
+            font-weight: 500;
+        }
+
+        .pricing-description {
+            color: var(--text-secondary);
+            font-size: 1rem;
+            margin-top: 0.75rem;
+            font-weight: 500;
+        }
+
+        .pricing-features {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            flex: 1;
+        }
+
+        .pricing-feature {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            margin-bottom: 1.25rem;
+            color: var(--text-secondary);
+            font-size: 0.95rem;
+            line-height: 1.4;
+        }
+
+        .pricing-feature i {
+            color: var(--highlight-color);
+            font-size: 1.1rem;
+            flex-shrink: 0;
+        }
+
+        .pricing-feature.disabled {
+            opacity: 0.5;
+            text-decoration: line-through;
+            color: rgba(255, 255, 255, 0.4);
+        }
+
+        .pricing-feature.disabled i {
+            color: rgba(99, 102, 241, 0.4);
+        }
+
+        .btn-subscribe {
+            width: 100%;
+            background: var(--accent-gradient);
+            color: white;
+            border: none;
+            padding: 1rem;
+            border-radius: 12px;
+            font-weight: 600;
+            margin-top: 2rem;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            font-size: 0.9rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn-subscribe::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(45deg, rgba(255,255,255,0.1), rgba(255,255,255,0));
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        .btn-subscribe:hover::after {
+            opacity: 1;
+        }
+
+        .btn-subscribe:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(99, 102, 241, 0.4);
+        }
+
+        @media (max-width: 1024px) {
+            .pricing-container {
+                grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+                gap: 1.5rem;
+            }
+
+            .pricing-card.featured {
+                transform: none;
+            }
+
+            .pricing-card:hover {
+                transform: translateY(-3px);
+            }
+        }
+
+        @media (max-width: 768px) {
+            .pricing-container {
+                grid-template-columns: 1fr;
+                max-width: 400px;
+                gap: 2rem;
+            }
+
+            .pricing-card {
+                padding: 2rem;
+            }
+
+            .pricing-title {
+                font-size: 1.5rem;
+            }
+
+            .pricing-price {
+                font-size: 2.5rem;
+            }
+
+            .pricing-feature {
+                font-size: 0.9rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="sidebar">
+        <div class="logo">
+            <img src="/assets/logotipo.png" alt="W2Clone Logo">
+            <div class="logo-text">
+                <h2>W2Clone</h2>
+                <span>Proteção Inteligente</span>
+            </div>
+        </div>
+
+        <nav>
+            <a href="/" class="nav-item">
+                <i class="bi bi-grid"></i>
+                Dashboard
+            </a>
+            <a href="/protection.html" class="nav-item">
+                <i class="bi bi-shield-check"></i>
+                Proteção
+            </a>
+            <a href="/notifications.html" class="nav-item">
+                <i class="bi bi-bell"></i>
+                Notificações
+            </a>
+            <a href="/plans.html" class="nav-item active">
+                <i class="bi bi-credit-card"></i>
+                Planos
+            </a>
+            <a href="/support.html" class="nav-item">
+                <i class="bi bi-question-circle"></i>
+                Suporte
+            </a>
+            <a href="#" class="nav-item" id="logoutBtn">
+                <i class="bi bi-box-arrow-right"></i>
+                Sair
+            </a>
+            <a href="/admin.html" class="nav-item admin">
+                <i class="bi bi-shield-lock"></i>
+                Administração
+            </a>
+        </nav>
+    </div>
+
+    <div class="main-content">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <div>
+                <h1 class="mb-0">Planos</h1>
+                <p class="text-secondary mb-0">Escolha o plano ideal para seu negócio</p>
+            </div>
+        </div>
+
+        <div class="text-center">
+            <div class="pricing-toggle">
+                <button class="toggle-btn active" onclick="togglePricing('monthly')">Mensal</button>
+                <button class="toggle-btn" onclick="togglePricing('annual')">
+                    Anual
+                    <span class="pricing-badge">2 meses grátis</span>
+                </button>
+            </div>
+        </div>
+
+        <div class="pricing-container" id="monthlyPlans">
+            <!-- Plano Iniciante -->
+            <div class="pricing-card">
+                <div class="pricing-header">
+                    <div class="pricing-title">Iniciante</div>
+                    <div class="pricing-price">R$ 47.00<span class="pricing-period">/mês</span></div>
+                    <div class="pricing-description">Proteção de 10 páginas</div>
+                </div>
+                <ul class="pricing-features">
+                    <li class="pricing-feature">
+                        <i class="bi bi-check-circle-fill"></i>
+                        Detecção automática de clonagem em tempo real
+                    </li>
+                    <li class="pricing-feature">
+                        <i class="bi bi-check-circle-fill"></i>
+                        Redireciona o tráfego do clone direto pra você
+                    </li>
+                    <li class="pricing-feature">
+                        <i class="bi bi-check-circle-fill"></i>
+                        Troca o link do botão de compra — o clone vende pra você
+                    </li>
+                    <li class="pricing-feature">
+                        <i class="bi bi-check-circle-fill"></i>
+                        Substitui imagens do clone por qualquer coisa que você quiser
+                    </li>
+                    <li class="pricing-feature">
+                        <i class="bi bi-check-circle-fill"></i>
+                        Suporte VIP
+                    </li>
+                    <li class="pricing-feature disabled">
+                        <i class="bi bi-check-circle-fill"></i>
+                        Análise completa do tráfego da sua página
+                    </li>
+                    <li class="pricing-feature disabled">
+                        <i class="bi bi-check-circle-fill"></i>
+                        Relatórios avançados das tentativas de cópia
+                    </li>
+                    <li class="pricing-feature disabled">
+                        <i class="bi bi-check-circle-fill"></i>
+                        Rastreamento de IP do clonador
+                    </li>
+                </ul>
+                <button class="btn-subscribe">Começar Agora</button>
+            </div>
+
+            <!-- Plano Premium -->
+            <div class="pricing-card featured">
+                <div class="pricing-header">
+                    <div class="pricing-title">Premium</div>
+                    <div class="pricing-price">R$ 97.00<span class="pricing-period">/mês</span></div>
+                    <div class="pricing-description">Proteção de 50 páginas</div>
+                </div>
+                <ul class="pricing-features">
+                    <li class="pricing-feature">
+                        <i class="bi bi-check-circle-fill"></i>
+                        Detecção automática de clonagem em tempo real
+                    </li>
+                    <li class="pricing-feature">
+                        <i class="bi bi-check-circle-fill"></i>
+                        Redireciona o tráfego do clone direto pra você
+                    </li>
+                    <li class="pricing-feature">
+                        <i class="bi bi-check-circle-fill"></i>
+                        Troca o link do botão de compra — o clone vende pra você
+                    </li>
+                    <li class="pricing-feature">
+                        <i class="bi bi-check-circle-fill"></i>
+                        Substitui imagens do clone por qualquer coisa que você quiser
+                    </li>
+                    <li class="pricing-feature">
+                        <i class="bi bi-check-circle-fill"></i>
+                        Suporte VIP
+                    </li>
+                    <li class="pricing-feature">
+                        <i class="bi bi-check-circle-fill"></i>
+                        Análise completa do tráfego da sua página
+                    </li>
+                    <li class="pricing-feature">
+                        <i class="bi bi-check-circle-fill"></i>
+                        Relatórios avançados das tentativas de cópia
+                    </li>
+                    <li class="pricing-feature disabled">
+                        <i class="bi bi-check-circle-fill"></i>
+                        Rastreamento de IP do clonador
+                    </li>
+                </ul>
+                <button class="btn-subscribe">Começar Agora</button>
+            </div>
+
+            <!-- Plano Avançado -->
+            <div class="pricing-card">
+                <div class="pricing-header">
+                    <div class="pricing-title">Avançado</div>
+                    <div class="pricing-price">R$ 197.00<span class="pricing-period">/mês</span></div>
+                    <div class="pricing-description">Proteção de 100 páginas</div>
+                </div>
+                <ul class="pricing-features">
+                    <li class="pricing-feature">
+                        <i class="bi bi-check-circle-fill"></i>
+                        Detecção automática de clonagem em tempo real
+                    </li>
+                    <li class="pricing-feature">
+                        <i class="bi bi-check-circle-fill"></i>
+                        Redireciona o tráfego do clone direto pra você
+                    </li>
+                    <li class="pricing-feature">
+                        <i class="bi bi-check-circle-fill"></i>
+                        Troca o link do botão de compra — o clone vende pra você
+                    </li>
+                    <li class="pricing-feature">
+                        <i class="bi bi-check-circle-fill"></i>
+                        Substitui imagens do clone por qualquer coisa que você quiser
+                    </li>
+                    <li class="pricing-feature">
+                        <i class="bi bi-check-circle-fill"></i>
+                        Suporte VIP
+                    </li>
+                    <li class="pricing-feature">
+                        <i class="bi bi-check-circle-fill"></i>
+                        Análise completa do tráfego da sua página
+                    </li>
+                    <li class="pricing-feature">
+                        <i class="bi bi-check-circle-fill"></i>
+                        Relatórios avançados das tentativas de cópia
+                    </li>
+                    <li class="pricing-feature">
+                        <i class="bi bi-check-circle-fill"></i>
+                        Rastreamento de IP do clonador
+                    </li>
+                </ul>
+                <button class="btn-subscribe">Começar Agora</button>
+            </div>
+        </div>
+
+        <div class="pricing-container" id="annualPlans" style="display: none;">
+            <!-- Plano Iniciante Anual -->
+            <div class="pricing-card">
+                <div class="pricing-header">
+                    <div class="pricing-title">Iniciante</div>
+                    <div class="pricing-price">R$ 470.00<span class="pricing-period">/ano</span></div>
+                    <div class="pricing-description">Proteção de 10 páginas</div>
+                </div>
+                <ul class="pricing-features">
+                    <li class="pricing-feature">
+                        <i class="bi bi-check-circle-fill"></i>
+                        Detecção automática de clonagem em tempo real
+                    </li>
+                    <li class="pricing-feature">
+                        <i class="bi bi-check-circle-fill"></i>
+                        Redireciona o tráfego do clone direto pra você
+                    </li>
+                    <li class="pricing-feature">
+                        <i class="bi bi-check-circle-fill"></i>
+                        Troca o link do botão de compra — o clone vende pra você
+                    </li>
+                    <li class="pricing-feature">
+                        <i class="bi bi-check-circle-fill"></i>
+                        Substitui imagens do clone por qualquer coisa que você quiser
+                    </li>
+                    <li class="pricing-feature">
+                        <i class="bi bi-check-circle-fill"></i>
+                        Suporte VIP
+                    </li>
+                    <li class="pricing-feature disabled">
+                        <i class="bi bi-check-circle-fill"></i>
+                        Análise completa do tráfego da sua página
+                    </li>
+                    <li class="pricing-feature disabled">
+                        <i class="bi bi-check-circle-fill"></i>
+                        Relatórios avançados das tentativas de cópia
+                    </li>
+                    <li class="pricing-feature disabled">
+                        <i class="bi bi-check-circle-fill"></i>
+                        Rastreamento de IP do clonador
+                    </li>
+                </ul>
+                <button class="btn-subscribe">Começar Agora</button>
+            </div>
+
+            <!-- Plano Premium Anual -->
+            <div class="pricing-card featured">
+                <div class="pricing-header">
+                    <div class="pricing-title">Premium</div>
+                    <div class="pricing-price">R$ 970.00<span class="pricing-period">/ano</span></div>
+                    <div class="pricing-description">Proteção de 50 páginas</div>
+                </div>
+                <ul class="pricing-features">
+                    <li class="pricing-feature">
+                        <i class="bi bi-check-circle-fill"></i>
+                        Detecção automática de clonagem em tempo real
+                    </li>
+                    <li class="pricing-feature">
+                        <i class="bi bi-check-circle-fill"></i>
+                        Redireciona o tráfego do clone direto pra você
+                    </li>
+                    <li class="pricing-feature">
+                        <i class="bi bi-check-circle-fill"></i>
+                        Troca o link do botão de compra — o clone vende pra você
+                    </li>
+                    <li class="pricing-feature">
+                        <i class="bi bi-check-circle-fill"></i>
+                        Substitui imagens do clone por qualquer coisa que você quiser
+                    </li>
+                    <li class="pricing-feature">
+                        <i class="bi bi-check-circle-fill"></i>
+                        Suporte VIP
+                    </li>
+                    <li class="pricing-feature">
+                        <i class="bi bi-check-circle-fill"></i>
+                        Análise completa do tráfego da sua página
+                    </li>
+                    <li class="pricing-feature">
+                        <i class="bi bi-check-circle-fill"></i>
+                        Relatórios avançados das tentativas de cópia
+                    </li>
+                    <li class="pricing-feature disabled">
+                        <i class="bi bi-check-circle-fill"></i>
+                        Rastreamento de IP do clonador
+                    </li>
+                </ul>
+                <button class="btn-subscribe">Começar Agora</button>
+            </div>
+
+            <!-- Plano Avançado Anual -->
+            <div class="pricing-card">
+                <div class="pricing-header">
+                    <div class="pricing-title">Avançado</div>
+                    <div class="pricing-price">R$ 1970.00<span class="pricing-period">/ano</span></div>
+                    <div class="pricing-description">Proteção de 100 páginas</div>
+                </div>
+                <ul class="pricing-features">
+                    <li class="pricing-feature">
+                        <i class="bi bi-check-circle-fill"></i>
+                        Detecção automática de clonagem em tempo real
+                    </li>
+                    <li class="pricing-feature">
+                        <i class="bi bi-check-circle-fill"></i>
+                        Redireciona o tráfego do clone direto pra você
+                    </li>
+                    <li class="pricing-feature">
+                        <i class="bi bi-check-circle-fill"></i>
+                        Troca o link do botão de compra — o clone vende pra você
+                    </li>
+                    <li class="pricing-feature">
+                        <i class="bi bi-check-circle-fill"></i>
+                        Substitui imagens do clone por qualquer coisa que você quiser
+                    </li>
+                    <li class="pricing-feature">
+                        <i class="bi bi-check-circle-fill"></i>
+                        Suporte VIP
+                    </li>
+                    <li class="pricing-feature">
+                        <i class="bi bi-check-circle-fill"></i>
+                        Análise completa do tráfego da sua página
+                    </li>
+                    <li class="pricing-feature">
+                        <i class="bi bi-check-circle-fill"></i>
+                        Relatórios avançados das tentativas de cópia
+                    </li>
+                    <li class="pricing-feature">
+                        <i class="bi bi-check-circle-fill"></i>
+                        Rastreamento de IP do clonador
+                    </li>
+                </ul>
+                <button class="btn-subscribe">Começar Agora</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            document.getElementById('logoutBtn').addEventListener('click', (e) => {
+                e.preventDefault();
+                logout();
+            });
+            
+            checkAdminStatus();
+        });
+
+        function togglePricing(type) {
+            const monthlyPlans = document.getElementById('monthlyPlans');
+            const annualPlans = document.getElementById('annualPlans');
+            const buttons = document.querySelectorAll('.toggle-btn');
+            
+            buttons.forEach(btn => btn.classList.remove('active'));
+            
+            if (type === 'monthly') {
+                monthlyPlans.style.display = 'grid';
+                annualPlans.style.display = 'none';
+                buttons[0].classList.add('active');
+            } else {
+                monthlyPlans.style.display = 'none';
+                annualPlans.style.display = 'grid';
+                buttons[1].classList.add('active');
+            }
+        }
+
+        async function logout() {
+            try {
+                const response = await fetch('/api/logout', {
+                    method: 'POST'
+                });
+                
+                if (response.ok) {
+                    localStorage.removeItem('token');
+                    localStorage.removeItem('user');
+                    window.location.href = '/login.html';
+                } else {
+                    throw new Error('Erro ao fazer logout');
+                }
+            } catch (error) {
+                console.error('Erro ao fazer logout:', error);
+                alert('Erro ao fazer logout. Tente novamente.');
+            }
+        }
+
+        async function checkAdminStatus() {
+            try {
+                const response = await fetch('/api/admin/users');
+                if (response.ok) {
+                    document.getElementById('adminLink').style.display = 'flex';
+                }
+            } catch (error) {
+                console.error('Erro ao verificar status de administrador:', error);
+            }
+        }
+    </script>
+</body>
+</html> 

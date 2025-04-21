@@ -1,0 +1,1084 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>W2Clone - Proteção contra clonagem de sites</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    <style>
+        :root {
+            --gradient-bg: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            --card-bg: rgba(255, 255, 255, 0.05);
+            --sidebar-bg: rgba(0, 0, 0, 0.3);
+            --text-primary: #ffffff;
+            --text-secondary: rgba(255, 255, 255, 0.7);
+            --accent-color: #4f46e5;
+            --accent-gradient: linear-gradient(45deg, #4f46e5, #7c3aed);
+            --border-color: rgba(255, 255, 255, 0.1);
+            --success-color: #10b981;
+            --warning-color: #f59e0b;
+        }
+
+        body {
+            background: var(--gradient-bg);
+            color: var(--text-primary);
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            min-height: 100vh;
+            margin: 0;
+            background-attachment: fixed;
+        }
+
+        .sidebar {
+            background: var(--sidebar-bg);
+            backdrop-filter: blur(10px);
+            width: 280px;
+            position: fixed;
+            top: 0;
+            left: 0;
+            height: 100vh;
+            border-right: 1px solid var(--border-color);
+            padding: 2rem 0;
+        }
+
+        .logo {
+            padding: 0 2rem;
+            margin-bottom: 3rem;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .logo img {
+            height: 40px;
+            width: auto;
+        }
+
+        .logo-text {
+            flex: 1;
+        }
+
+        .logo-text h2 {
+            font-size: 1.8rem;
+            font-weight: 700;
+            margin: 0;
+            background: var(--accent-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            letter-spacing: -1px;
+        }
+
+        .logo-text span {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            display: block;
+            margin-top: 0.25rem;
+        }
+
+        .main-content {
+            margin-left: 280px;
+            padding: 2rem 3rem;
+        }
+
+        .nav-item {
+            padding: 1rem 2rem;
+            color: var(--text-secondary);
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            transition: all 0.3s;
+            border-left: 3px solid transparent;
+            margin: 4px 0;
+        }
+
+        .nav-item:hover, .nav-item.active {
+            background: var(--card-bg);
+            color: var(--text-primary);
+            border-left-color: var(--accent-color);
+        }
+
+        .nav-item i {
+            font-size: 1.2rem;
+        }
+
+        .nav-item.admin {
+            color: #818cf8;
+            background: rgba(79, 70, 229, 0.1);
+            margin-top: auto;
+        }
+
+        .nav-item.admin:hover {
+            background: rgba(79, 70, 229, 0.2);
+            color: #818cf8;
+        }
+
+        .nav-item.admin i {
+            color: #818cf8;
+        }
+
+        .card {
+            background: var(--card-bg);
+            backdrop-filter: blur(10px);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        }
+
+        .search-bar {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 1rem 1.5rem;
+            color: var(--text-primary);
+            width: 100%;
+            margin-bottom: 1.5rem;
+            backdrop-filter: blur(10px);
+            transition: all 0.3s;
+        }
+
+        .search-bar:focus {
+            outline: none;
+            border-color: var(--accent-color);
+            box-shadow: 0 0 0 4px rgba(255, 64, 129, 0.1);
+        }
+
+        .btn-add {
+            background: var(--accent-gradient);
+            color: white;
+            border: none;
+            padding: 0.8rem 1.5rem;
+            border-radius: 12px;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .btn-add:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(255, 64, 129, 0.3);
+            color: white;
+        }
+
+        .site-item {
+            background: rgba(0, 0, 0, 0.2);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 1rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: all 0.3s;
+        }
+
+        .site-item:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+        }
+
+        .site-info {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .site-url {
+            color: var(--text-primary);
+            font-weight: 600;
+            font-size: 1.1rem;
+        }
+
+        .site-status {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            display: inline-block;
+        }
+
+        .status-dot.active {
+            background: var(--success-color);
+            box-shadow: 0 0 12px var(--success-color);
+        }
+
+        .status-dot.inactive {
+            background: var(--warning-color);
+            box-shadow: 0 0 12px var(--warning-color);
+        }
+
+        .btn-config {
+            background: rgba(255, 255, 255, 0.1);
+            color: var(--text-primary);
+            border: 1px solid var(--border-color);
+            padding: 0.8rem 1.2rem;
+            border-radius: 12px;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-weight: 500;
+        }
+
+        .btn-config:hover {
+            background: rgba(255, 255, 255, 0.15);
+            transform: translateY(-2px);
+        }
+
+        .modal-content {
+            background: var(--gradient-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+        }
+
+        .modal-header {
+            border-bottom: 1px solid var(--border-color);
+            padding: 1.5rem;
+        }
+
+        .modal-body {
+            padding: 2rem;
+        }
+
+        .modal-footer {
+            border-top: 1px solid var(--border-color);
+            padding: 1.5rem;
+        }
+
+        .form-control {
+            background: rgba(0, 0, 0, 0.2);
+            border: 1px solid var(--border-color);
+            color: var(--text-primary);
+            border-radius: 12px;
+            padding: 0.8rem 1.2rem;
+        }
+
+        .form-control:focus {
+            background: rgba(0, 0, 0, 0.3);
+            border-color: var(--accent-color);
+            color: var(--text-primary);
+            box-shadow: 0 0 0 4px rgba(255, 64, 129, 0.1);
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 4rem 2rem;
+            color: var(--text-secondary);
+        }
+
+        .empty-state i {
+            font-size: 4rem;
+            margin-bottom: 1.5rem;
+            background: var(--accent-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .empty-state h3 {
+            color: var(--text-primary);
+            margin-bottom: 1rem;
+            font-weight: 600;
+        }
+
+        .form-check-input {
+            background-color: rgba(255, 255, 255, 0.1);
+            border-color: var(--border-color);
+        }
+
+        .form-check-input:checked {
+            background-color: var(--accent-color);
+            border-color: var(--accent-color);
+        }
+
+        .config-section {
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .config-section h6 {
+            color: var(--text-primary);
+            margin-bottom: 1rem;
+            font-weight: 600;
+        }
+
+        pre {
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 12px;
+            padding: 1.5rem;
+            color: var(--text-primary);
+            margin-bottom: 1rem;
+        }
+
+        .stats-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .stat-card {
+            background: var(--card-bg);
+            border-radius: 16px;
+            padding: 1.5rem;
+            border: 1px solid var(--border-color);
+        }
+
+        .stat-value {
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            background: var(--accent-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .stat-label {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+
+        @media (max-width: 768px) {
+            .sidebar {
+                width: 100%;
+                height: auto;
+                position: relative;
+            }
+            
+            .main-content {
+                margin-left: 0;
+                padding: 1rem;
+            }
+            
+            .stats-container {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .installation-steps .step {
+            display: flex;
+            gap: 1rem;
+        }
+
+        .step-number {
+            width: 32px;
+            height: 32px;
+            background: var(--accent-color);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+        }
+
+        .step-content {
+            flex: 1;
+        }
+
+        .function-option {
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 8px;
+            padding: 1rem;
+        }
+
+        .site-url-display {
+            background: rgba(79, 70, 229, 0.1);
+            border: 1px solid rgba(79, 70, 229, 0.2);
+            border-radius: 12px;
+            padding: 1rem 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .site-url-display strong {
+            color: var(--accent-color);
+            display: block;
+            margin-bottom: 0.5rem;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .site-url-display span {
+            font-size: 1.1rem;
+            word-break: break-all;
+        }
+
+        .clone-item {
+            background: rgba(0, 0, 0, 0.2);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 1.5rem;
+            margin-bottom: 1rem;
+            transition: all 0.3s;
+        }
+
+        .clone-item:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+            border-color: var(--accent-color);
+        }
+
+        .clone-url {
+            font-size: 1.1rem;
+            color: var(--text-primary);
+            margin-bottom: 1rem;
+            word-break: break-all;
+        }
+
+        .clone-info {
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+            margin-bottom: 1.5rem;
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+
+        .clone-info-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .clone-status {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem 1rem;
+            border-radius: 100px;
+            font-size: 0.85rem;
+            font-weight: 500;
+        }
+
+        .clone-status.pending {
+            background: rgba(245, 158, 11, 0.1);
+            color: var(--warning-color);
+        }
+
+        .clone-status.blocked {
+            background: rgba(16, 185, 129, 0.1);
+            color: var(--success-color);
+        }
+
+        .clone-actions {
+            display: flex;
+            gap: 1rem;
+        }
+
+        .btn-functions {
+            background: var(--accent-gradient);
+            color: white;
+            border: none;
+            padding: 0.8rem 1.5rem;
+            border-radius: 12px;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-weight: 500;
+        }
+
+        .btn-functions:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(79, 70, 229, 0.3);
+        }
+
+        .empty-clones {
+            text-align: center;
+            padding: 3rem 2rem;
+        }
+
+        .empty-clones i {
+            font-size: 3rem;
+            color: var(--accent-color);
+            margin-bottom: 1.5rem;
+        }
+
+        .empty-clones h4 {
+            color: var(--text-primary);
+            margin-bottom: 1rem;
+        }
+
+        .empty-clones p {
+            color: var(--text-secondary);
+        }
+    </style>
+</head>
+<body>
+    <div class="sidebar">
+        <div class="logo">
+            <img src="/assets/logotipo.png" alt="W2Clone Logo">
+            <div class="logo-text">
+                <h2>W2Clone</h2>
+                <span>Proteção Inteligente</span>
+            </div>
+        </div>
+
+        <nav>
+            <a href="/" class="nav-item">
+                <i class="bi bi-grid"></i>
+                Dashboard
+            </a>
+            <a href="/protection.html" class="nav-item active">
+                <i class="bi bi-shield-check"></i>
+                Proteção
+            </a>
+            <a href="/notifications.html" class="nav-item">
+                <i class="bi bi-bell"></i>
+                Notificações
+            </a>
+            <a href="/plans.html" class="nav-item">
+                <i class="bi bi-credit-card"></i>
+                Planos
+            </a>
+            <a href="/support.html" class="nav-item">
+                <i class="bi bi-question-circle"></i>
+                Suporte
+            </a>
+            <a href="#" class="nav-item" id="logoutBtn">
+                <i class="bi bi-box-arrow-right"></i>
+                Sair
+            </a>
+            <a href="/admin.html" class="nav-item admin">
+                <i class="bi bi-shield-lock"></i>
+                Administração
+            </a>
+        </nav>
+    </div>
+
+    <div class="main-content">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <div>
+                <h1 class="mb-0">Dashboard</h1>
+                <p class="text-secondary mb-0">Gerencie seus sites protegidos</p>
+            </div>
+            <button class="btn-add" onclick="showAddSiteModal()">
+                <i class="bi bi-plus-lg"></i> Adicionar Site
+            </button>
+        </div>
+
+        <div class="stats-container">
+            <div class="stat-card">
+                <div class="stat-value" id="totalSites">0</div>
+                <div class="stat-label">Sites Protegidos</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" id="totalClones">0</div>
+                <div class="stat-label">Tentativas Bloqueadas</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value">100%</div>
+                <div class="stat-label">Taxa de Proteção</div>
+            </div>
+        </div>
+
+        <input type="text" class="search-bar" placeholder="Pesquisar sites..." onkeyup="filterSites(this.value)">
+
+        <div class="card">
+            <div class="card-body" id="sitesList">
+                <!-- Sites serão carregados aqui -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Adicionar Site -->
+    <div class="modal fade" id="addSiteModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Adicionar Novo Site</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="siteForm">
+                        <div class="mb-3">
+                            <label for="siteUrl" class="form-label">URL do Site</label>
+                            <input type="url" class="form-control" id="siteUrl" required 
+                                   placeholder="https://seusite.com">
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="button" class="btn-add" onclick="addSite()">Adicionar Site</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de Configurações -->
+    <div class="modal fade" id="configModal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Configurações do Site</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="config-section">
+                        <h6>Script de Proteção</h6>
+                        <p class="text-secondary mb-3">Siga os passos abaixo para proteger seu site:</p>
+                        
+                        <div class="installation-steps mb-4">
+                            <div class="step mb-3">
+                                <div class="step-number">1</div>
+                                <div class="step-content">
+                                    <h6>Copie o script</h6>
+                                    <pre id="configScript" class="bg-dark p-3 rounded" style="color: #fff;"></pre>
+                                    <button class="btn-config mt-2" onclick="copyScript()">
+                                        <i class="bi bi-clipboard"></i> Copiar Script
+                                    </button>
+                                </div>
+                            </div>
+                            
+                            <div class="step mb-3">
+                                <div class="step-number">2</div>
+                                <div class="step-content">
+                                    <h6>Cole no seu site</h6>
+                                    <p class="text-secondary">Cole o script no final da tag &lt;body&gt; do seu site, logo antes do fechamento.</p>
+                                </div>
+                            </div>
+                            
+                            <div class="step">
+                                <div class="step-number">3</div>
+                                <div class="step-content">
+                                    <h6>Pronto!</h6>
+                                    <p class="text-secondary">Seu site está protegido. Você receberá notificações quando clones forem detectados.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fechar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de Atividades -->
+    <div class="modal fade" id="activityModal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Atividades do Site</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="site-url-display">
+                        <strong>Site Original</strong>
+                        <span id="originalSiteUrl"></span>
+                    </div>
+                    
+                    <div class="clones-list" id="clonesList">
+                        <!-- Lista de clones será carregada aqui -->
+                    </div>
+                    
+                    <div class="empty-clones d-none">
+                        <i class="bi bi-shield-check"></i>
+                        <h4>Nenhum Clone Detectado</h4>
+                        <p>Seu site está protegido e nenhuma tentativa de clonagem foi detectada.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de Funções -->
+    <div class="modal fade" id="functionsModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Funções Anti-Clone</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="clone-url-display mb-4">
+                        <strong>Clone detectado</strong>
+                        <span id="cloneUrlDisplay"></span>
+                    </div>
+
+                    <div class="functions-section">
+                        <div class="function-option mb-3">
+                            <label class="d-flex align-items-center mb-2">
+                                <input type="checkbox" id="redirectOption" class="form-check-input me-2">
+                                <span>Redirecionar visitantes</span>
+                            </label>
+                            <input type="url" id="redirectUrl" class="form-control" 
+                                   placeholder="https://seusite.com">
+                            <small class="text-secondary">Os visitantes serão redirecionados para este endereço</small>
+                        </div>
+
+                        <div class="function-option mb-3">
+                            <label class="d-flex align-items-center mb-2">
+                                <input type="checkbox" id="redirectLinksOption" class="form-check-input me-2">
+                                <span>Redirecionar links</span>
+                            </label>
+                            <input type="url" id="redirectLinksUrl" class="form-control" 
+                                   placeholder="https://seusite.com">
+                            <small class="text-secondary">Todos os links da página serão redirecionados para este endereço</small>
+                        </div>
+
+                        <div class="function-option mb-3">
+                            <label class="d-flex align-items-center mb-2">
+                                <input type="checkbox" id="replaceImagesOption" class="form-check-input me-2">
+                                <span>Substituir imagens</span>
+                            </label>
+                            <input type="url" id="imageUrl" class="form-control" 
+                                   placeholder="https://suaimagem.com/imagem.jpg">
+                            <small class="text-secondary">Todas as imagens serão substituídas por esta</small>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="button" class="btn-add" onclick="saveFunctions()">Salvar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        let addSiteModal;
+        let configModal;
+        let activityModal;
+        let functionsModal;
+        let currentSiteId;
+        let currentCloneUrl;
+        let sites = [];
+
+        document.addEventListener('DOMContentLoaded', () => {
+            addSiteModal = new bootstrap.Modal(document.getElementById('addSiteModal'));
+            configModal = new bootstrap.Modal(document.getElementById('configModal'));
+            activityModal = new bootstrap.Modal(document.getElementById('activityModal'));
+            functionsModal = new bootstrap.Modal(document.getElementById('functionsModal'));
+            
+            // Adicionar evento de clique no botão de logout
+            document.getElementById('logoutBtn').addEventListener('click', (e) => {
+                e.preventDefault();
+                logout();
+            });
+            
+            checkAdminStatus();
+            loadSites();
+        });
+
+        // Verifica autenticação
+        const token = localStorage.getItem('token');
+        const user = JSON.parse(localStorage.getItem('user'));
+
+        if (!token || !user) {
+            window.location.href = '/login.html';
+        }
+
+        // Função para fazer logout
+        async function logout() {
+            try {
+                const response = await fetch('/api/logout', {
+                    method: 'POST'
+                });
+                
+                if (response.ok) {
+                    localStorage.removeItem('token');
+                    localStorage.removeItem('user');
+                    window.location.href = '/login.html';
+                } else {
+                    throw new Error('Erro ao fazer logout');
+                }
+            } catch (error) {
+                console.error('Erro ao fazer logout:', error);
+                alert('Erro ao fazer logout. Tente novamente.');
+            }
+        }
+
+        function updateStats() {
+            document.getElementById('totalSites').textContent = sites.length;
+            const totalClones = sites.reduce((acc, site) => acc + (site.clones?.length || 0), 0);
+            document.getElementById('totalClones').textContent = totalClones;
+        }
+
+        function showAddSiteModal() {
+            document.getElementById('siteUrl').value = '';
+            addSiteModal.show();
+        }
+
+        function showActivityModal(siteId) {
+            currentSiteId = siteId;
+            const site = sites.find(s => s._id === siteId);
+            
+            if (site) {
+                document.getElementById('originalSiteUrl').textContent = site.url;
+                const clonesList = document.getElementById('clonesList');
+                const emptyClones = document.querySelector('.empty-clones');
+                
+                if (site.clones && site.clones.length > 0) {
+                    clonesList.innerHTML = site.clones.map(clone => `
+                        <div class="clone-item">
+                            <div class="clone-url">${clone.url}</div>
+                            <div class="clone-info">
+                                <div class="clone-info-item">
+                                    <i class="bi bi-clock"></i>
+                                    Detectado em: ${new Date(clone.detectedAt).toLocaleString()}
+                                </div>
+                                <div class="clone-status ${clone.status === 'blocked' ? 'blocked' : 'pending'}">
+                                    <i class="bi bi-${clone.status === 'blocked' ? 'shield-check' : 'shield-exclamation'}"></i>
+                                    ${clone.status === 'blocked' ? 'Bloqueado' : 'Pendente'}
+                                </div>
+                            </div>
+                            <div class="clone-actions">
+                                <button class="btn-functions" onclick="showFunctionsModal('${siteId}', '${clone.url}')">
+                                    <i class="bi bi-lightning"></i>
+                                    Funções
+                                </button>
+                            </div>
+                        </div>
+                    `).join('');
+                    clonesList.classList.remove('d-none');
+                    emptyClones.classList.add('d-none');
+                } else {
+                    clonesList.classList.add('d-none');
+                    emptyClones.classList.remove('d-none');
+                }
+            }
+            
+            activityModal.show();
+        }
+
+        function showFunctionsModal(siteId, cloneUrl) {
+            currentSiteId = siteId;
+            currentCloneUrl = cloneUrl;
+            const site = sites.find(s => s._id === siteId);
+            const clone = site.clones.find(c => c.url === cloneUrl);
+            
+            document.getElementById('cloneUrlDisplay').textContent = cloneUrl;
+            
+            // Carregar configurações específicas do clone
+            if (clone && clone.actions) {
+                document.getElementById('redirectOption').checked = clone.actions.redirect || false;
+                document.getElementById('redirectLinksOption').checked = clone.actions.redirectLinks || false;
+                document.getElementById('replaceImagesOption').checked = clone.actions.replaceImages || false;
+                document.getElementById('redirectUrl').value = clone.actions.redirectUrl || '';
+                document.getElementById('redirectLinksUrl').value = clone.actions.redirectLinksUrl || '';
+                document.getElementById('imageUrl').value = clone.actions.imageUrl || '';
+            } else {
+                // Resetar formulário se não houver configurações
+                document.getElementById('redirectOption').checked = false;
+                document.getElementById('redirectLinksOption').checked = false;
+                document.getElementById('replaceImagesOption').checked = false;
+                document.getElementById('redirectUrl').value = '';
+                document.getElementById('redirectLinksUrl').value = '';
+                document.getElementById('imageUrl').value = '';
+            }
+            
+            activityModal.hide();
+            functionsModal.show();
+        }
+
+        async function saveFunctions() {
+            try {
+                const actions = {
+                    redirect: document.getElementById('redirectOption').checked,
+                    redirectUrl: document.getElementById('redirectUrl').value,
+                    redirectLinks: document.getElementById('redirectLinksOption').checked,
+                    redirectLinksUrl: document.getElementById('redirectLinksUrl').value,
+                    replaceImages: document.getElementById('replaceImagesOption').checked,
+                    imageUrl: document.getElementById('imageUrl').value
+                };
+
+                const response = await fetch(`/api/sites/${currentSiteId}/clones/${encodeURIComponent(currentCloneUrl)}/config`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify({ actions })
+                });
+
+                if (response.ok) {
+                    functionsModal.hide();
+                    await loadSites(); // Recarregar todos os sites para atualizar os dados
+                    showActivityModal(currentSiteId); // Reabrir o modal de atividades
+                } else {
+                    const data = await response.json();
+                    throw new Error(data.error || 'Erro ao salvar configurações');
+                }
+            } catch (error) {
+                console.error('Erro:', error);
+                alert('Erro ao salvar configurações: ' + error.message);
+            }
+        }
+
+        async function loadSites() {
+            try {
+                const response = await fetch('/api/sites', {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+                
+                if (!response.ok) {
+                    throw new Error('Erro ao carregar sites');
+                }
+                
+                sites = await response.json();
+                updateStats();
+                
+                const sitesList = document.getElementById('sitesList');
+                if (sites.length === 0) {
+                    sitesList.innerHTML = `
+                        <div class="empty-state">
+                            <i class="bi bi-shield-plus"></i>
+                            <h3>Nenhum site protegido</h3>
+                            <p>Comece adicionando seu primeiro site para proteção.</p>
+                            <button class="btn-add mt-3" onclick="showAddSiteModal()">
+                                <i class="bi bi-plus-lg"></i> Adicionar Site
+                            </button>
+                        </div>
+                    `;
+                    return;
+                }
+
+                sitesList.innerHTML = sites.map(site => `
+                    <div class="site-item">
+                        <div class="site-info">
+                            <div class="site-url">${site.url}</div>
+                            <div class="site-status">
+                                <span class="status-dot ${site.scriptActive ? 'active' : 'inactive'}"></span>
+                                ${site.scriptActive ? 'Proteção Ativa' : 'Proteção Inativa'}
+                                · ${site.clones?.length || 0} clones detectados
+                            </div>
+                        </div>
+                        <div class="site-actions">
+                            <button class="btn-config me-2" onclick="showConfigModal('${site._id}')">
+                                <i class="bi bi-code-square"></i> Configurações
+                            </button>
+                            <button class="btn-config" onclick="showActivityModal('${site._id}')">
+                                <i class="bi bi-activity"></i> Ver Atividades
+                            </button>
+                        </div>
+                    </div>
+                `).join('');
+            } catch (error) {
+                console.error('Erro ao carregar sites:', error);
+            }
+        }
+
+        async function addSite() {
+            const url = document.getElementById('siteUrl').value;
+            
+            try {
+                const response = await fetch('/api/sites', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify({ url })
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok) {
+                    addSiteModal.hide();
+                    loadSites();
+                    // Mostrar o modal de configurações com o script
+                    showConfigModal(data._id);
+                } else {
+                    alert('Erro ao adicionar site: ' + data.error);
+                }
+            } catch (error) {
+                alert('Erro ao adicionar site: ' + error.message);
+            }
+        }
+
+        function showConfigModal(siteId) {
+            currentSiteId = siteId;
+            const site = sites.find(s => s._id === siteId);
+            if (site) {
+                const scriptContent = `<script src="https://w2clone.onrender.com/w2clone.js"><\/script>
+<script>
+    W2Clone.protect("${site.url}");
+<\/script>`;
+                
+                document.getElementById('configScript').textContent = scriptContent;
+            }
+            configModal.show();
+        }
+
+        function copyScript() {
+            const script = document.getElementById('configScript');
+            navigator.clipboard.writeText(script.textContent);
+            alert('Script copiado com sucesso!');
+        }
+
+        function filterSites(query) {
+            const filteredSites = sites.filter(site => 
+                site.url.toLowerCase().includes(query.toLowerCase())
+            );
+            
+            const sitesList = document.getElementById('sitesList');
+            if (filteredSites.length === 0) {
+                sitesList.innerHTML = `
+                    <div class="empty-state">
+                        <i class="bi bi-search"></i>
+                        <h3>Nenhum resultado encontrado</h3>
+                        <p>Tente uma busca diferente</p>
+                    </div>
+                `;
+                return;
+            }
+
+            sitesList.innerHTML = filteredSites.map(site => `
+                <div class="site-item">
+                    <div class="site-info">
+                        <div class="site-url">${site.url}</div>
+                        <div class="site-status">
+                            <span class="status-dot ${site.scriptActive ? 'active' : 'inactive'}"></span>
+                            ${site.scriptActive ? 'Proteção Ativa' : 'Proteção Inativa'}
+                            · ${site.clones?.length || 0} clones detectados
+                        </div>
+                    </div>
+                    <div class="site-actions">
+                        <button class="btn-config me-2" onclick="showConfigModal('${site._id}')">
+                            <i class="bi bi-code-square"></i> Configurações
+                        </button>
+                        <button class="btn-config" onclick="showActivityModal('${site._id}')">
+                            <i class="bi bi-activity"></i> Ver Atividades
+                        </button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // Verificar se o usuário é administrador
+        async function checkAdminStatus() {
+            try {
+                const response = await fetch('/api/admin/users');
+                if (response.ok) {
+                    // Se a requisição for bem-sucedida, o usuário é administrador
+                    document.getElementById('adminLink').style.display = 'flex';
+                }
+            } catch (error) {
+                console.error('Erro ao verificar status de administrador:', error);
+            }
+        }
+    </script>
+</body>
+</html> 

@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Notificações - W2Clone</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    <style>
+        :root {
+            --gradient-bg: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            --card-bg: rgba(255, 255, 255, 0.05);
+            --sidebar-bg: rgba(0, 0, 0, 0.3);
+            --text-primary: #ffffff;
+            --text-secondary: rgba(255, 255, 255, 0.7);
+            --accent-color: #4f46e5;
+            --accent-gradient: linear-gradient(45deg, #4f46e5, #7c3aed);
+            --border-color: rgba(255, 255, 255, 0.1);
+            --success-color: #10b981;
+            --warning-color: #f59e0b;
+            --highlight-color: #6366f1;
+        }
+
+        body {
+            background: var(--gradient-bg);
+            color: var(--text-primary);
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            min-height: 100vh;
+            margin: 0;
+            background-attachment: fixed;
+        }
+
+        .sidebar {
+            background: var(--sidebar-bg);
+            backdrop-filter: blur(10px);
+            width: 280px;
+            position: fixed;
+            top: 0;
+            left: 0;
+            height: 100vh;
+            border-right: 1px solid var(--border-color);
+            padding: 2rem 0;
+        }
+
+        .logo {
+            padding: 0 2rem;
+            margin-bottom: 3rem;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .logo img {
+            height: 40px;
+            width: auto;
+        }
+
+        .logo-text {
+            flex: 1;
+        }
+
+        .logo-text h2 {
+            font-size: 1.8rem;
+            font-weight: 700;
+            margin: 0;
+            background: var(--accent-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            letter-spacing: -1px;
+        }
+
+        .logo-text span {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            display: block;
+            margin-top: 0.25rem;
+        }
+
+        .main-content {
+            margin-left: 280px;
+            padding: 2rem 3rem;
+        }
+
+        .nav-item {
+            padding: 1rem 2rem;
+            color: var(--text-secondary);
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            transition: all 0.3s;
+            border-left: 3px solid transparent;
+            margin: 4px 0;
+        }
+
+        .nav-item:hover, .nav-item.active {
+            background: var(--card-bg);
+            color: var(--text-primary);
+            border-left-color: var(--accent-color);
+        }
+
+        .nav-item i {
+            font-size: 1.2rem;
+        }
+
+        .nav-item.admin {
+            color: #818cf8;
+            background: rgba(79, 70, 229, 0.1);
+            margin-top: auto;
+            display: none;
+        }
+
+        .nav-item.admin:hover {
+            background: rgba(79, 70, 229, 0.2);
+            color: #818cf8;
+        }
+
+        @media (max-width: 768px) {
+            .sidebar {
+                width: 100%;
+                height: auto;
+                position: relative;
+            }
+            
+            .main-content {
+                margin-left: 0;
+                padding: 1rem;
+            }
+        }
+
+        .page-header {
+            margin-bottom: 2rem;
+        }
+
+        .page-header h1 {
+            font-size: 2rem;
+            font-weight: 700;
+            margin: 0;
+            background: var(--accent-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .page-header p {
+            color: var(--text-secondary);
+            margin: 0.5rem 0 0 0;
+        }
+
+        .notification-card {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            backdrop-filter: blur(10px);
+        }
+
+        .notification-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .notification-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin: 0;
+        }
+
+        .notification-description {
+            color: var(--text-secondary);
+            margin-bottom: 1.5rem;
+        }
+
+        .btn-notification {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.75rem 1.5rem;
+            background: var(--accent-gradient);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+
+        .btn-notification:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(79, 70, 229, 0.3);
+        }
+
+        .btn-notification:disabled {
+            opacity: 0.7;
+            cursor: not-allowed;
+            transform: none !important;
+            box-shadow: none !important;
+        }
+
+        .btn-notification:disabled i {
+            opacity: 0.7;
+        }
+
+        .btn-notification i {
+            font-size: 1.2rem;
+        }
+
+        .notification-status {
+            margin-top: 1rem;
+            padding: 1rem;
+            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.05);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: all 0.3s ease;
+        }
+
+        .notification-status.active {
+            background: rgba(16, 185, 129, 0.1);
+            color: var(--success-color);
+            border: 1px solid rgba(16, 185, 129, 0.2);
+        }
+
+        .notification-status.denied {
+            background: rgba(239, 68, 68, 0.1);
+            color: #ef4444;
+            border: 1px solid rgba(239, 68, 68, 0.2);
+        }
+
+        .notification-status.pending {
+            background: rgba(245, 158, 11, 0.1);
+            color: var(--warning-color);
+            border: 1px solid rgba(245, 158, 11, 0.2);
+        }
+
+        .notification-status i {
+            font-size: 1.2rem;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+
+        .notification-status.active {
+            animation: pulse 2s infinite;
+        }
+    </style>
+</head>
+<body>
+    <div class="sidebar">
+        <div class="logo">
+            <img src="/assets/logotipo.png" alt="W2Clone Logo">
+            <div class="logo-text">
+                <h2>W2Clone</h2>
+                <span>Proteção Inteligente</span>
+            </div>
+        </div>
+
+        <nav>
+            <a href="/" class="nav-item">
+                <i class="bi bi-grid"></i>
+                Dashboard
+            </a>
+            <a href="/protection.html" class="nav-item">
+                <i class="bi bi-shield-check"></i>
+                Proteção
+            </a>
+            <a href="/notifications.html" class="nav-item active">
+                <i class="bi bi-bell"></i>
+                Notificações
+            </a>
+            <a href="/plans.html" class="nav-item">
+                <i class="bi bi-credit-card"></i>
+                Planos
+            </a>
+            <a href="/support.html" class="nav-item">
+                <i class="bi bi-question-circle"></i>
+                Suporte
+            </a>
+            <a href="#" class="nav-item" id="logoutBtn">
+                <i class="bi bi-box-arrow-right"></i>
+                Sair
+            </a>
+            <a href="/admin.html" class="nav-item admin">
+                <i class="bi bi-shield-lock"></i>
+                Administração
+            </a>
+        </nav>
+    </div>
+
+    <main class="main-content">
+        <div class="page-header">
+            <h1>Notificações</h1>
+            <p>Gerencie suas preferências de notificações</p>
+        </div>
+
+        <div class="notification-card">
+            <div class="notification-header">
+                <h2 class="notification-title">Notificações do Sistema</h2>
+            </div>
+            <p class="notification-description">
+                Receba alertas instantâneos quando seu site for clonado ou quando houver atividades importantes.
+            </p>
+            
+            <button type="button" class="btn-notification" id="notificationBtn">
+                <i class="bi bi-bell"></i>
+                Ativar Notificações
+            </button>
+            
+            <div class="notification-status" id="notificationStatus">
+                <i class="bi bi-info-circle"></i>
+                <span id="notificationStatusText">Status: Não ativado</span>
+            </div>
+        </div>
+    </main>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="js/auth.js"></script>
+    <script src="js/notifications.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            updateNotificationStatus();
+
+            document.getElementById('notificationBtn').addEventListener('click', () => {
+                enableNotifications().then(success => {
+                    if (success) {
+                        updateNotificationStatus();
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+</html> 
