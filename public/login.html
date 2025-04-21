@@ -232,7 +232,13 @@
         </div>
     </div>
 
+    <script src="/js/config.js"></script>
     <script>
+        // Verifica se já está autenticado
+        if (isAuthenticated()) {
+            window.location.href = config.routes.dashboard;
+        }
+
         document.getElementById('loginForm').addEventListener('submit', async (e) => {
             e.preventDefault();
             
@@ -246,7 +252,7 @@
             submitButton.innerHTML = '<span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span> Entrando...';
             
             try {
-                const response = await fetch('/api/login', {
+                const response = await fetch(config.api.login, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json'
@@ -257,12 +263,12 @@
                 const data = await response.json();
                 
                 if (response.ok) {
-                    // Salva o token JWT
+                    // Salva o token JWT e dados do usuário
                     localStorage.setItem('token', data.token);
                     localStorage.setItem('user', JSON.stringify(data.user));
                     
                     // Redireciona para a página principal
-                    window.location.href = '/';
+                    window.location.replace(config.routes.dashboard);
                 } else {
                     errorAlert.textContent = data.error;
                     errorAlert.style.display = 'block';
@@ -272,6 +278,7 @@
                     submitButton.innerHTML = '<i class="bi bi-box-arrow-in-right me-2"></i> Entrar';
                 }
             } catch (error) {
+                console.error('Erro ao fazer login:', error);
                 errorAlert.textContent = 'Erro ao fazer login. Tente novamente.';
                 errorAlert.style.display = 'block';
                 

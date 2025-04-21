@@ -22,7 +22,9 @@ app.use(session({
     saveUninitialized: false,
     cookie: { 
         secure: process.env.NODE_ENV === 'production',
-        maxAge: 24 * 60 * 60 * 1000 // 24 horas
+        maxAge: 24 * 60 * 60 * 1000, // 24 horas
+        httpOnly: true,
+        sameSite: 'strict'
     }
 }));
 
@@ -36,7 +38,8 @@ const requireAuth = (req, res, next) => {
         '/api/register',
         '/assets',
         '/css',
-        '/js'
+        '/js',
+        '/favicon.ico'
     ];
 
     // Verifica se é uma rota pública
@@ -45,7 +48,11 @@ const requireAuth = (req, res, next) => {
     }
 
     // Verifica se está autenticado
-    if (!req.session.isAuthenticated) {
+    const token = req.headers.authorization?.split(' ')[1] || 
+                 req.query.token || 
+                 req.cookies?.token;
+
+    if (!token && !req.session.isAuthenticated) {
         if (req.xhr || req.path.startsWith('/api/')) {
             return res.status(401).json({ error: 'Não autorizado' });
         }
@@ -159,13 +166,22 @@ app.post('/api/login', async (req, res) => {
         req.session.userId = user._id;
         req.session.userName = user.name;
 
+        // Define o cookie do token
+        res.cookie('token', token, {
+            httpOnly: true,
+            secure: process.env.NODE_ENV === 'production',
+            maxAge: 24 * 60 * 60 * 1000, // 24 horas
+            sameSite: 'strict'
+        });
+
         res.json({ 
             success: true,
             token,
             user: {
                 id: user._id,
                 name: user.name,
-                email: user.email
+                email: user.email,
+                isAdmin: user.isAdmin
             }
         });
     } catch (error) {
