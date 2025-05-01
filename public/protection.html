@@ -547,15 +547,11 @@
                 <i class="bi bi-credit-card"></i>
                 Planos
             </a>
-            <a href="/support.html" class="nav-item">
-                <i class="bi bi-question-circle"></i>
-                Suporte
-            </a>
             <a href="#" class="nav-item" id="logoutBtn">
                 <i class="bi bi-box-arrow-right"></i>
                 Sair
             </a>
-            <a href="/admin.html" class="nav-item admin">
+            <a href="/admin.html" class="nav-item admin" id="adminLink">
                 <i class="bi bi-shield-lock"></i>
                 Administração
             </a>
@@ -902,25 +898,45 @@
                     imageUrl: document.getElementById('imageUrl').value
                 };
 
-                const response = await fetch(`/api/sites/${currentSiteId}/clones/${encodeURIComponent(currentCloneUrl)}/config`, {
+                console.log('[saveFunctions] Enviando para endpoint:', `/api/sites/${currentSiteId}/config`);
+                console.log('[saveFunctions] Payload:', actions);
+
+                const response = await fetch(`/api/sites/${currentSiteId}/config`, {
                     method: 'PUT',
                     headers: {
                         'Content-Type': 'application/json',
                         'Authorization': `Bearer ${token}`
                     },
-                    body: JSON.stringify({ actions })
+                    body: JSON.stringify(actions)
                 });
+
+                console.log('[saveFunctions] Status da resposta:', response.status);
+                const contentType = response.headers.get('content-type');
+                console.log('[saveFunctions] Content-Type:', contentType);
 
                 if (response.ok) {
                     functionsModal.hide();
                     await loadSites(); // Recarregar todos os sites para atualizar os dados
                     showActivityModal(currentSiteId); // Reabrir o modal de atividades
                 } else {
-                    const data = await response.json();
-                    throw new Error(data.error || 'Erro ao salvar configurações');
+                    let errorMsg = 'Erro ao salvar configurações';
+                    try {
+                        if (contentType && contentType.includes('application/json')) {
+                            const data = await response.json();
+                            errorMsg = data.error || errorMsg;
+                            console.error('[saveFunctions] Erro do backend:', data);
+                        } else {
+                            const text = await response.text();
+                            errorMsg = 'Resposta inesperada do servidor: ' + text;
+                            console.error('[saveFunctions] Resposta inesperada:', text);
+                        }
+                    } catch (e) {
+                        console.error('[saveFunctions] Erro ao processar resposta:', e);
+                    }
+                    throw new Error(errorMsg);
                 }
             } catch (error) {
-                console.error('Erro:', error);
+                console.error('[saveFunctions] Erro final:', error);
                 alert('Erro ao salvar configurações: ' + error.message);
             }
         }

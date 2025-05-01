@@ -58,6 +58,23 @@ const requireAuth = (req, res, next) => {
 // Aplica middleware de autenticação
 app.use(requireAuth);
 
+// Middleware para verificar token JWT em rotas da API
+const verifyApiToken = (req, res, next) => {
+    const token = req.headers.authorization?.split(' ')[1];
+    
+    if (!token) {
+        return res.status(401).json({ error: 'Token não fornecido' });
+    }
+
+    try {
+        const decoded = jwt.verify(token, process.env.JWT_SECRET || 'seu-segredo-jwt');
+        req.user = decoded;
+        next();
+    } catch (error) {
+        return res.status(401).json({ error: 'Token inválido' });
+    }
+};
+
 // Serve arquivos estáticos
 app.use(express.static('public'));
 
@@ -174,6 +191,44 @@ app.post('/api/login', async (req, res) => {
     }
 });
 
+// Rota para obter perfil do usuário
+app.get('/api/user/profile', verifyApiToken, async (req, res) => {
+    try {
+        const user = await User.findById(req.user.id).select('-password');
+        if (!user) {
+            return res.status(404).json({ error: 'Usuário não encontrado' });
+        }
+        res.json(user);
+    } catch (error) {
+        console.error('Erro ao buscar perfil:', error);
+        res.status(500).json({ error: 'Erro ao buscar perfil' });
+    }
+});
+
+// Rota para atualizar perfil do usuário
+app.put('/api/user/profile', verifyApiToken, async (req, res) => {
+    try {
+        const { name, password } = req.body;
+        const user = await User.findById(req.user.id).select('+password');
+        
+        if (!user) {
+            return res.status(404).json({ error: 'Usuário não encontrado' });
+        }
+
+        if (name) user.name = name;
+        if (password) user.password = password;
+
+        await user.save();
+        
+        // Retorna o usuário atualizado sem a senha
+        const updatedUser = await User.findById(user._id).select('-password');
+        res.json(updatedUser);
+    } catch (error) {
+        console.error('Erro ao atualizar perfil:', error);
+        res.status(500).json({ error: 'Erro ao atualizar perfil' });
+    }
+});
+
 // Rota de logout
 app.post('/api/logout', (req, res) => {
     req.session.destroy(err => {
@@ -184,23 +239,6 @@ app.post('/api/logout', (req, res) => {
         res.json({ success: true });
     });
 });
-
-// Middleware para verificar token JWT em rotas da API
-const verifyApiToken = (req, res, next) => {
-    const token = req.headers.authorization?.split(' ')[1];
-    
-    if (!token) {
-        return res.status(401).json({ error: 'Token não fornecido' });
-    }
-
-    try {
-        const decoded = jwt.verify(token, process.env.JWT_SECRET || 'seu-segredo-jwt');
-        req.user = decoded;
-        next();
-    } catch (error) {
-        return res.status(401).json({ error: 'Token inválido' });
-    }
-};
 
 // Rotas protegidas da API
 app.post('/api/sites', verifyApiToken, async (req, res) => {
